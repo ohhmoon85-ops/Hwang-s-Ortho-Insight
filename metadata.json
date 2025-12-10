@@ -1,0 +1,5 @@
+{
+  "name": "Dr. Hwang's Ortho-Insight",
+  "description": "A specialized AI assistant for orthopedic clinics providing differential diagnoses, critical checkpoints, and work-up recommendations using Gemini 2.5.",
+  "requestFramePermissions": []
+}
