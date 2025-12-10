@@ -12,8 +12,8 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     define: {
-      // Safely inject the API key from the environment
-      'process.env.API_KEY': JSON.stringify(env.API_KEY || '')
+      // Safely inject the API key. Prioritize process.env (Vercel) over loaded .env file
+      'process.env.API_KEY': JSON.stringify(process.env.API_KEY || env.API_KEY || '')
     }
   };
 });
