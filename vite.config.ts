@@ -5,6 +5,19 @@ export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, '.', '');
   
+  // Check available keys (Priority: System Env -> .env file)
+  const finalApiKey = process.env.API_KEY || env.API_KEY || '';
+
+  // DEBUG LOGGING for Vercel Build Logs
+  console.log("-------------------------------------------------------");
+  console.log("BUILD STATUS: Checking for API_KEY...");
+  if (finalApiKey) {
+    console.log("BUILD STATUS: SUCCESS - API_KEY found (Starts with: " + finalApiKey.substring(0, 4) + "...)");
+  } else {
+    console.log("BUILD STATUS: FAILURE - API_KEY is missing or empty.");
+  }
+  console.log("-------------------------------------------------------");
+
   return {
     plugins: [react()],
     build: {
@@ -12,8 +25,8 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     define: {
-      // Safely inject the API key. Prioritize process.env (Vercel) over loaded .env file
-      'process.env.API_KEY': JSON.stringify(process.env.API_KEY || env.API_KEY || '')
+      // Safely inject the API key into the client-side code
+      'process.env.API_KEY': JSON.stringify(finalApiKey)
     }
   };
 });
