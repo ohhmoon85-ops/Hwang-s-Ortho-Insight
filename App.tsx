@@ -5,14 +5,17 @@ import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import { Stethoscope, User, Clock, Key } from 'lucide-react';
 
+// [중요] Vercel 환경 변수에서 키를 가져오는 올바른 방법 (Vite 방식)
+const API_KEY = import.meta.env.VITE_API_KEY;
+
 const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const handleAnalyze = async (data: PatientData) => {
-    // Check if API key exists in environment
-    if (!process.env.API_KEY) {
+    // [수정됨] 위에서 정의한 API_KEY 변수를 확인합니다.
+    if (!API_KEY) {
        setApiKeyMissing(true);
        return;
     }
@@ -80,20 +83,22 @@ const App: React.FC = () => {
                   onClick={() => setAnalysisResult(null)}
                   className="text-xs text-slate-500 hover:text-slate-300"
                >
-                 Clear Results
+                  Clear Results
                </button>
             )}
           </div>
           <div className="flex-1 p-6 overflow-hidden">
             {apiKeyMissing ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                 <div className="bg-red-500/10 p-4 rounded-full mb-4">
-                    <Key size={32} className="text-red-500" />
-                 </div>
-                 <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
-                 <p className="text-slate-400 max-w-md">
-                   To use this application, you must provide a valid Google Gemini API Key in the environment variable `process.env.API_KEY`.
-                 </p>
+                  <div className="bg-red-500/10 p-4 rounded-full mb-4">
+                     <Key size={32} className="text-red-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
+                  <p className="text-slate-400 max-w-md">
+                    To use this application, make sure you have added 
+                    <span className="text-white font-mono mx-1">VITE_API_KEY</span> 
+                    to your Vercel Environment Variables.
+                  </p>
               </div>
             ) : (
               <OutputPanel result={analysisResult} loading={isAnalyzing} />
