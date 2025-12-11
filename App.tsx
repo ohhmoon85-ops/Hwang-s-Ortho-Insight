@@ -5,8 +5,8 @@ import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import { Stethoscope, User, Clock, Key } from 'lucide-react';
 
-// [중요] Vite 방식(import.meta.env)으로 키를 가져옵니다.
-const API_KEY = import.meta.env.VITE_API_KEY;
+// [핵심 변경] Vercel에서 키를 가져오는 최신 방식
+const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
 
 const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const handleAnalyze = async (data: PatientData) => {
-    // [수정] 위에서 가져온 API_KEY 변수를 검사합니다.
+    // 키가 있는지 확인
     if (!API_KEY) {
        setApiKeyMissing(true);
        return;
@@ -95,9 +95,9 @@ const App: React.FC = () => {
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
                   <p className="text-slate-400 max-w-md">
-                    To use this application, make sure you have added 
+                    To use this application, ensure 
                     <span className="text-white font-mono mx-1">VITE_API_KEY</span> 
-                    to your Vercel Environment Variables.
+                    is set in Vercel.
                   </p>
               </div>
             ) : (
