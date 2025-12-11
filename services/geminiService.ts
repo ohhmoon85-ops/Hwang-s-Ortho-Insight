@@ -1,10 +1,9 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { PatientData } from "../types";
 
-// [중요] 키 가져오는 방식 수정 (Vite 방식)
+// [중요] 여기서도 Vite 방식(import.meta.env)으로 키를 가져옵니다.
 const API_KEY = import.meta.env.VITE_API_KEY;
 
-// Define the response schema strictly to ensure consistent JSON output
 const analysisSchema: Schema = {
   type: Type.OBJECT,
   properties: {
@@ -14,46 +13,25 @@ const analysisSchema: Schema = {
       items: {
         type: Type.OBJECT,
         properties: {
-          name: {
-            type: Type.STRING,
-            description: "Name of the disease (Korean/English mixed is okay)."
-          },
-          probability: {
-            type: Type.NUMBER,
-            description: "Estimated probability percentage (0-100)."
-          },
-          rationale: {
-            type: Type.STRING,
-            description: "One line medical rationale for this diagnosis."
-          }
+          name: { type: Type.STRING, description: "Name of the disease (Korean/English mixed is okay)." },
+          probability: { type: Type.NUMBER, description: "Estimated probability percentage (0-100)." },
+          rationale: { type: Type.STRING, description: "One line medical rationale for this diagnosis." }
         },
         required: ["name", "probability", "rationale"]
       }
     },
-    criticalCheckpoints: {
-      type: Type.ARRAY,
-      description: "3-4 key questions or physical exam points to verify immediately.",
-      items: { type: Type.STRING }
-    },
-    redFlags: {
-      type: Type.ARRAY,
-      description: "Any urgent or dangerous conditions to rule out.",
-      items: { type: Type.STRING }
-    },
-    recommendedWorkup: {
-      type: Type.ARRAY,
-      description: "Recommended imaging (X-ray views, MRI) or labs.",
-      items: { type: Type.STRING }
-    }
+    criticalCheckpoints: { type: Type.ARRAY, items: { type: Type.STRING } },
+    redFlags: { type: Type.ARRAY, items: { type: Type.STRING } },
+    recommendedWorkup: { type: Type.ARRAY, items: { type: Type.STRING } }
   },
   required: ["differentialDiagnoses", "criticalCheckpoints", "redFlags", "recommendedWorkup"]
 };
 
 export const generateOrthopedicInsight = async (patientData: PatientData): Promise<any> => {
   try {
-    // [수정됨] 위에서 정의한 API_KEY를 사용
+    // [수정] 위에서 정의한 변수를 사용합니다.
     if (!API_KEY) {
-        throw new Error("API Key is missing in service call");
+        throw new Error("API Key is missing (VITE_API_KEY not found)");
     }
 
     const ai = new GoogleGenAI({ apiKey: API_KEY });
@@ -76,7 +54,7 @@ export const generateOrthopedicInsight = async (patientData: PatientData): Promi
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash', // 모델명을 최신 버전으로 안전하게 지정
+      model: 'gemini-2.0-flash',
       contents: prompt,
       config: {
         systemInstruction: "You are an expert Orthopedic AI Assistant. Your goal is to provide high-level 'Second Opinion' differential diagnoses. Be concise, professional, and clinically accurate. Highlight red flags immediately.",
@@ -86,7 +64,8 @@ export const generateOrthopedicInsight = async (patientData: PatientData): Promi
       }
     });
 
-    const text = response.text(); // [참고] SDK 버전에 따라 text() 함수일 수 있음
+    // SDK 버전에 따라 text() 함수 사용
+    const text = response.text(); 
     if (!text) {
       throw new Error("Empty response from Gemini");
     }
