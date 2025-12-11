@@ -1,6 +1,9 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { PatientData } from "../types";
 
+// [중요] 키 가져오는 방식 수정 (Vite 방식)
+const API_KEY = import.meta.env.VITE_API_KEY;
+
 // Define the response schema strictly to ensure consistent JSON output
 const analysisSchema: Schema = {
   type: Type.OBJECT,
@@ -48,7 +51,12 @@ const analysisSchema: Schema = {
 
 export const generateOrthopedicInsight = async (patientData: PatientData): Promise<any> => {
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    // [수정됨] 위에서 정의한 API_KEY를 사용
+    if (!API_KEY) {
+        throw new Error("API Key is missing in service call");
+    }
+
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
 
     const prompt = `
       Patient Profile:
@@ -61,24 +69,24 @@ export const generateOrthopedicInsight = async (patientData: PatientData): Promi
       - Chief Complaint Details: ${patientData.mainComplaint}
 
       Task:
-      As a senior orthopedic advisor for Dr. Hwang, analyze this patient data.
-      Provide a structured clinical assessment suitable for a medical professional.
-      Use standard medical terminology (English/Korean mixed).
-      Focus on biomechanics, pathology, and clinical correlation.
+      - As a senior orthopedic advisor for Dr. Hwang, analyze this patient data.
+      - Provide a structured clinical assessment suitable for a medical professional.
+      - Use standard medical terminology (English/Korean mixed).
+      - Focus on biomechanics, pathology, and clinical correlation.
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.0-flash', // 모델명을 최신 버전으로 안전하게 지정
       contents: prompt,
       config: {
         systemInstruction: "You are an expert Orthopedic AI Assistant. Your goal is to provide high-level 'Second Opinion' differential diagnoses. Be concise, professional, and clinically accurate. Highlight red flags immediately.",
         responseMimeType: "application/json",
         responseSchema: analysisSchema,
-        temperature: 0.3, // Low temperature for consistent medical advice
+        temperature: 0.3, 
       }
     });
 
-    const text = response.text;
+    const text = response.text(); // [참고] SDK 버전에 따라 text() 함수일 수 있음
     if (!text) {
       throw new Error("Empty response from Gemini");
     }
