@@ -5,23 +5,20 @@ import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import { Stethoscope, User, Clock, Key } from 'lucide-react';
 
-// [핵심 변경] Vercel에서 키를 가져오는 최신 방식
-const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
-
 const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const handleAnalyze = async (data: PatientData) => {
-    // 키가 있는지 확인
-    if (!API_KEY) {
+    // Check if API key exists in environment
+    if (!process.env.API_KEY) {
        setApiKeyMissing(true);
        return;
     }
 
     setIsAnalyzing(true);
-    setAnalysisResult(null); 
+    setAnalysisResult(null); // Reset previous result
     
     try {
       const result = await generateOrthopedicInsight(data);
@@ -83,22 +80,20 @@ const App: React.FC = () => {
                   onClick={() => setAnalysisResult(null)}
                   className="text-xs text-slate-500 hover:text-slate-300"
                >
-                  Clear Results
+                 Clear Results
                </button>
             )}
           </div>
           <div className="flex-1 p-6 overflow-hidden">
             {apiKeyMissing ? (
               <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                  <div className="bg-red-500/10 p-4 rounded-full mb-4">
-                     <Key size={32} className="text-red-500" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
-                  <p className="text-slate-400 max-w-md">
-                    To use this application, ensure 
-                    <span className="text-white font-mono mx-1">VITE_API_KEY</span> 
-                    is set in Vercel.
-                  </p>
+                 <div className="bg-red-500/10 p-4 rounded-full mb-4">
+                    <Key size={32} className="text-red-500" />
+                 </div>
+                 <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
+                 <p className="text-slate-400 max-w-md">
+                   To use this application, you must provide a valid Google Gemini API Key in the environment variable `process.env.API_KEY`.
+                 </p>
               </div>
             ) : (
               <OutputPanel result={analysisResult} loading={isAnalyzing} />

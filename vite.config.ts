@@ -1,23 +1,32 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  // 환경 변수 로드
-  const env = loadEnv(mode, process.cwd(), '');
+  // Load env file based on `mode` in the current working directory.
+  const env = loadEnv(mode, '.', '');
   
-  // Vercel 환경 변수에서 키 찾기 (VITE_API_KEY 우선)
-  const apiKey = process.env.VITE_API_KEY || process.env.API_KEY || env.VITE_API_KEY || env.API_KEY;
+  // Check available keys (Priority: System Env -> .env file)
+  const finalApiKey = process.env.API_KEY || env.API_KEY || '';
+
+  // DEBUG LOGGING for Vercel Build Logs
+  console.log("-------------------------------------------------------");
+  console.log("BUILD STATUS: Checking for API_KEY...");
+  if (finalApiKey) {
+    console.log("BUILD STATUS: SUCCESS - API_KEY found (Starts with: " + finalApiKey.substring(0, 4) + "...)");
+  } else {
+    console.log("BUILD STATUS: FAILURE - API_KEY is missing or empty.");
+  }
+  console.log("-------------------------------------------------------");
 
   return {
     plugins: [react()],
-    // [중요] 빌드 결과물이 나올 폴더를 명확히 지정
     build: {
       outDir: 'dist',
+      emptyOutDir: true,
     },
     define: {
-      // [수정됨] 전체를 덮어쓰지 않고, 필요한 API Key만 콕 집어서 넣어줍니다.
-      'process.env.API_KEY': JSON.stringify(apiKey),
-    },
-  }
-})
+      // Safely inject the API key into the client-side code
+      'process.env.API_KEY': JSON.stringify(finalApiKey)
+    }
+  };
+});
