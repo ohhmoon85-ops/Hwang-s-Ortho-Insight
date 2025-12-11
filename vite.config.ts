@@ -6,15 +6,16 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   
   // Check available keys (Priority: System Env -> .env file)
-  const finalApiKey = process.env.API_KEY || env.API_KEY || '';
+  // Now explicitly checking VITE_API_KEY as well per user request
+  const finalApiKey = process.env.API_KEY || env.API_KEY || process.env.VITE_API_KEY || env.VITE_API_KEY || '';
 
   // DEBUG LOGGING for Vercel Build Logs
   console.log("-------------------------------------------------------");
-  console.log("BUILD STATUS: Checking for API_KEY...");
+  console.log("BUILD STATUS: Checking for API Key...");
   if (finalApiKey) {
-    console.log("BUILD STATUS: SUCCESS - API_KEY found (Starts with: " + finalApiKey.substring(0, 4) + "...)");
+    console.log("BUILD STATUS: SUCCESS - API Key found (Starts with: " + finalApiKey.substring(0, 4) + "...)");
   } else {
-    console.log("BUILD STATUS: FAILURE - API_KEY is missing or empty.");
+    console.log("BUILD STATUS: FAILURE - No API Key found (Checked API_KEY and VITE_API_KEY).");
   }
   console.log("-------------------------------------------------------");
 
@@ -25,7 +26,8 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
     },
     define: {
-      // Safely inject the API key into the client-side code
+      // Safely inject the found key into the client-side code as 'process.env.API_KEY'
+      // This allows the app code to remain consistent
       'process.env.API_KEY': JSON.stringify(finalApiKey)
     }
   };

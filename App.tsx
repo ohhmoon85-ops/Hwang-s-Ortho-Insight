@@ -105,7 +105,7 @@ const App: React.FC = () => {
                      Add a new variable:
                    </p>
                    <div className="bg-black/50 p-3 rounded font-mono text-sm text-green-400 border border-slate-600">
-                     Key: API_KEY<br/>
+                     Key: VITE_API_KEY<br/>
                      Value: AIza... (your Gemini API Key)
                    </div>
                    <p className="flex items-start text-sm text-slate-500 mt-4 border-t border-slate-700 pt-3">
