@@ -5,7 +5,7 @@ import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import { Stethoscope, User, Clock, Key } from 'lucide-react';
 
-// [핵심 변경] Vercel에서 키를 가져오는 최신 방식
+// [중요] 이렇게 바뀌어야 정상입니다!
 const API_KEY = import.meta.env.VITE_API_KEY || import.meta.env.API_KEY;
 
 const App: React.FC = () => {
