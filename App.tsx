@@ -5,7 +5,7 @@ import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
 import { Stethoscope, User, Clock, Key } from 'lucide-react';
 
-// [중요] Vercel 환경 변수에서 키를 가져오는 올바른 방법 (Vite 방식)
+// [중요] Vite 방식(import.meta.env)으로 키를 가져옵니다.
 const API_KEY = import.meta.env.VITE_API_KEY;
 
 const App: React.FC = () => {
@@ -14,14 +14,14 @@ const App: React.FC = () => {
   const [apiKeyMissing, setApiKeyMissing] = useState(false);
 
   const handleAnalyze = async (data: PatientData) => {
-    // [수정됨] 위에서 정의한 API_KEY 변수를 확인합니다.
+    // [수정] 위에서 가져온 API_KEY 변수를 검사합니다.
     if (!API_KEY) {
        setApiKeyMissing(true);
        return;
     }
 
     setIsAnalyzing(true);
-    setAnalysisResult(null); // Reset previous result
+    setAnalysisResult(null); 
     
     try {
       const result = await generateOrthopedicInsight(data);
