@@ -3,7 +3,7 @@ import { PatientData, AnalysisResult } from './types';
 import { generateOrthopedicInsight } from './services/geminiService';
 import InputPanel from './components/InputPanel';
 import OutputPanel from './components/OutputPanel';
-import { Stethoscope, User, Clock, Key } from 'lucide-react';
+import { Stethoscope, User, Clock, Key, Settings } from 'lucide-react';
 
 const App: React.FC = () => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
@@ -86,14 +86,33 @@ const App: React.FC = () => {
           </div>
           <div className="flex-1 p-6 overflow-hidden">
             {apiKeyMissing ? (
-              <div className="h-full flex flex-col items-center justify-center text-center p-8">
-                 <div className="bg-red-500/10 p-4 rounded-full mb-4">
-                    <Key size={32} className="text-red-500" />
+              <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-slate-900/80">
+                 <div className="bg-red-500/10 p-6 rounded-full mb-6 border border-red-500/30">
+                    <Key size={48} className="text-red-500" />
                  </div>
-                 <h3 className="text-xl font-bold text-white mb-2">API Key Missing</h3>
-                 <p className="text-slate-400 max-w-md">
-                   To use this application, you must provide a valid Google Gemini API Key in the environment variable `process.env.API_KEY`.
-                 </p>
+                 <h3 className="text-2xl font-bold text-white mb-4">API Key Required</h3>
+                 <div className="text-slate-400 max-w-lg space-y-4 text-left bg-slate-800 p-6 rounded-lg border border-slate-700">
+                   <p className="flex items-start">
+                     <span className="text-medical-accent mr-2 font-bold">1.</span>
+                     Go to your Vercel Project Settings.
+                   </p>
+                   <p className="flex items-start">
+                     <span className="text-medical-accent mr-2 font-bold">2.</span>
+                     Navigate to <strong className="text-white mx-1">Environment Variables</strong> via the sidebar.
+                   </p>
+                   <p className="flex items-start">
+                     <span className="text-medical-accent mr-2 font-bold">3.</span>
+                     Add a new variable:
+                   </p>
+                   <div className="bg-black/50 p-3 rounded font-mono text-sm text-green-400 border border-slate-600">
+                     Key: API_KEY<br/>
+                     Value: AIza... (your Gemini API Key)
+                   </div>
+                   <p className="flex items-start text-sm text-slate-500 mt-4 border-t border-slate-700 pt-3">
+                     <Settings size={14} className="mr-1 mt-0.5" />
+                     Note: You must <strong>Redeploy</strong> your app after saving the variable.
+                   </p>
+                 </div>
               </div>
             ) : (
               <OutputPanel result={analysisResult} loading={isAnalyzing} />
